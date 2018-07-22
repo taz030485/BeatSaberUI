@@ -10,7 +10,7 @@ Initial release
 # Developers  
 Add a reference to BeatSaberUI to you project, just like IllusionPlugin  
 
-# Exmaple Usage  
+# Examaple Usage  
 Remember to add  
 ```csharp
 using BeatSaberUI;
@@ -65,7 +65,7 @@ You can also get the transform of the UI screen and add your own elements
 subMenu.transform
 ```
 
-List Exmaple
+List Examaple
 ```csharp
 subMenu3.AddListSetting<SongSpeedSettingsController>("Song Speed");
 ```
