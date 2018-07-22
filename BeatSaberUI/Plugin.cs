@@ -7,7 +7,7 @@ namespace BeatSaberUI
 {
     public class Plugin : IPlugin
     {
-        public string Name => "SettingsUI";
+        public string Name => "BeatSaberUI";
         public string Version => "1.0";   
     
         private bool _init = false;
