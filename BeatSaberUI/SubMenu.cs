@@ -15,7 +15,7 @@ namespace BeatSaberUI
 {
     public class SubMenu
     {
-        Transform transform;
+        public Transform transform;
 
         public SubMenu(Transform transform)
         {
