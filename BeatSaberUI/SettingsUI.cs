@@ -12,6 +12,7 @@ using TMPro;
 using IllusionPlugin;
 using HMUI;
 using UnityEngine.Events;
+using BeatSaberUI.Utilities;
 
 namespace BeatSaberUI
 {
@@ -33,6 +34,7 @@ namespace BeatSaberUI
         static MainSettingsTableView _mainSettingsTableView = null;
         static TableView subMenuTableView = null;
         static MainSettingsTableCell tableCell = null;
+        static TableViewHelper subMenuTableViewHelper;
 
         static Button _pageUpButton = null;
         static Button _pageDownButton = null;
@@ -112,7 +114,8 @@ namespace BeatSaberUI
                     settingsMenu = Resources.FindObjectsOfTypeAll<SettingsViewController>().FirstOrDefault();
                     mainSettingsMenu = Resources.FindObjectsOfTypeAll<MainSettingsMenuViewController>().FirstOrDefault();
                     _mainSettingsTableView = mainSettingsMenu.GetPrivateField<MainSettingsTableView>("_mainSettingsTableView");
-                    subMenuTableView = _mainSettingsTableView.GetPrivateField<TableView>("_tableView");
+                    subMenuTableView = _mainSettingsTableView.GetComponentInChildren<TableView>();
+                    subMenuTableViewHelper = subMenuTableView.gameObject.AddComponent<TableViewHelper>();
                     othersSubmenu = settingsMenu.transform.Find("SubSettingsViewControllers").Find("Others");
 
                     RectTransform okButton = (RectTransform)settingsMenu.transform.Find("OkButton"); //{x: -17, y: 6}
@@ -123,7 +126,7 @@ namespace BeatSaberUI
                     CancelButton.anchoredPosition += buttonOffset;
                     ApplyButton.anchoredPosition += buttonOffset;
 
-                    if (subMenuTableView != null)
+                    if (_mainSettingsTableView != null)
                     {
                         AddPageButtons();
                     }
@@ -145,34 +148,37 @@ namespace BeatSaberUI
 
         static void AddPageButtons()
         {
+            RectTransform viewport = _mainSettingsTableView.GetComponentsInChildren<RectTransform>().First(x => x.name == "Viewport");
+            viewport.anchorMin = new Vector2(0f, 0.5f);
+            viewport.anchorMax = new Vector2(1f, 0.5f);
+            viewport.sizeDelta = new Vector2(0f, 48f);
+            viewport.anchoredPosition = new Vector2(0f, 0f);
+
             if (_pageUpButton == null)
             {
-                _pageUpButton = Instantiate(Resources.FindObjectsOfTypeAll<Button>().First(x => (x.name == "PageUpButton")), settingsMenu.transform, false);
-                //(_pageUpButton.transform as RectTransform).anchorMin = new Vector2(0.5f, 1f);
-                //(_pageUpButton.transform as RectTransform).anchorMax = new Vector2(0.5f, 1f);
-                //(_pageUpButton.transform as RectTransform).anchoredPosition = new Vector2(0f, -14f);
+                _pageUpButton = Instantiate(Resources.FindObjectsOfTypeAll<Button>().First(x => (x.name == "PageUpButton")), _mainSettingsTableView.transform, false);
+                (_pageUpButton.transform as RectTransform).anchorMin = new Vector2(0.5f, 0.5f);
+                (_pageUpButton.transform as RectTransform).anchorMax = new Vector2(0.5f, 0.5f);
+                (_pageUpButton.transform as RectTransform).anchoredPosition = new Vector2(0f, 24f);
                 _pageUpButton.interactable = true;
-                //_pageUpButton.onClick.AddListener(new UnityAction(subMenuTableView.PageScrollUp));
+                _pageUpButton.onClick.AddListener(delegate()
+                {
+                    subMenuTableViewHelper.PageScrollUp();
+                });
             }
 
             if (_pageDownButton == null)
             {
-                _pageDownButton = Instantiate(Resources.FindObjectsOfTypeAll<Button>().First(x => (x.name == "PageDownButton")), settingsMenu.transform, false);
-                //(_pageDownButton.transform as RectTransform).anchorMin = new Vector2(0.5f, 0f);
-                //(_pageDownButton.transform as RectTransform).anchorMax = new Vector2(0.5f, 0f);
-                //(_pageDownButton.transform as RectTransform).anchoredPosition = new Vector2(0f, 8f);
+                _pageDownButton = Instantiate(Resources.FindObjectsOfTypeAll<Button>().First(x => (x.name == "PageDownButton")), _mainSettingsTableView.transform, false);
+                (_pageDownButton.transform as RectTransform).anchorMin = new Vector2(0.5f, 0.5f);
+                (_pageDownButton.transform as RectTransform).anchorMax = new Vector2(0.5f, 0.5f);
+                (_pageDownButton.transform as RectTransform).anchoredPosition = new Vector2(0f, -24f);
                 _pageDownButton.interactable = true;
-                //_pageDownButton.onClick.AddListener(new UnityAction(subMenuTableView.PageScrollDown));
+                _pageDownButton.onClick.AddListener(delegate ()
+                {
+                    subMenuTableViewHelper.PageScrollDown();
+                });
             }
-
-            /*
-             * Just copying the buttons, and not setting them to the table view
-             * they don't appear. And when they are set, they are disabled because the table
-             * thinks the scroll view is big enough to display all the cells
-             */
-
-            //subMenuTableView.SetPrivateField("_pageUpButton", _pageUpButton);
-            //subMenuTableView.SetPrivateField("_pageDownButton", _pageDownButton);
         }
 
         public static SubMenu CreateSubMenu(string name)
