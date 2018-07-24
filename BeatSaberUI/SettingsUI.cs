@@ -10,6 +10,8 @@ using VRUI;
 using VRUIControls;
 using TMPro;
 using IllusionPlugin;
+using HMUI;
+using UnityEngine.Events;
 
 namespace BeatSaberUI
 {
@@ -18,16 +20,31 @@ namespace BeatSaberUI
         public const int MainScene = 1;
         public const int GameScene = 5;
         
-        public static SettingsUI Instance = null;
-        MainMenuViewController _mainMenuViewController = null;
-        SimpleDialogPromptViewController prompt = null;
+        static SettingsUI Instance = null;
+        static bool ready = false;
+        public static bool Ready
+        {
+            get => ready;
+        }
 
+        static MainMenuViewController _mainMenuViewController = null;
+        static SettingsViewController settingsMenu = null;
+        static MainSettingsMenuViewController mainSettingsMenu = null;
+        static MainSettingsTableView _mainSettingsTableView = null;
+        static TableView subMenuTableView = null;
         static MainSettingsTableCell tableCell = null;
+
+        static Button _pageUpButton = null;
+        static Button _pageDownButton = null;
+        static Transform othersSubmenu = null;
+        static Vector2 buttonOffset = new Vector2(24, 0);
+
+        static SimpleDialogPromptViewController prompt = null;        
 
         public static void OnLoad()
         {
             if (Instance != null) return;
-            new GameObject("SettingsUI").AddComponent<SettingsUI>();
+            new GameObject("Beat Saber UI").AddComponent<SettingsUI>();
         }
 
         public void Awake()
@@ -44,17 +61,126 @@ namespace BeatSaberUI
             }
         }
 
+        private void Update()
+        {
+            //if (Input.GetKeyDown((KeyCode)ConInput.Vive.RightTrackpadPress))
+            //{
+            //    LogComponents(mainSettingsMenu.transform, "=");
+            //}
+            //if (Input.GetKeyDown((KeyCode)ConInput.Vive.RightTrackpadPress))
+            //{
+            //    buttonOffset.x += 0.1f;
+            //    Console.WriteLine(buttonOffset.x);
+            //}
+            //if (Input.GetKeyDown((KeyCode)ConInput.Vive.LeftTrackpadPress))
+            //{
+            //    buttonOffset.x -= 0.1f;
+            //    Console.WriteLine(buttonOffset.x);
+            //}
+        }
+
         public void SceneManagerOnActiveSceneChanged(Scene arg0, Scene scene)
         {
             if (scene.buildIndex == MainScene)
             {
-                _mainMenuViewController = Resources.FindObjectsOfTypeAll<MainMenuViewController>().First();
-                var _menuMasterViewController = Resources.FindObjectsOfTypeAll<StandardLevelSelectionFlowCoordinator>().First();
-                prompt = ReflectionUtil.GetPrivateField<SimpleDialogPromptViewController>(_menuMasterViewController, "_simpleDialogPromptViewController");
+                SetupUI();
+
+                var testSub = CreateSubMenu("Test 1");
+                var testSub2 = CreateSubMenu("Test 2");
+                var testSub3 = CreateSubMenu("Test 3");
+                var testSub4 = CreateSubMenu("Test 4");
+                //var testSub5 = CreateSubMenu("Test 5");
+                //var testSub6 = CreateSubMenu("Test 6");
             }
         }
 
+        private static void SetupUI()
+        {
+            if (mainSettingsMenu == null)
+            {
+                ready = false;
+            }
+
+            if (!Ready)
+            {
+                try
+                {
+                    var _menuMasterViewController = Resources.FindObjectsOfTypeAll<StandardLevelSelectionFlowCoordinator>().First();
+                    prompt = ReflectionUtil.GetPrivateField<SimpleDialogPromptViewController>(_menuMasterViewController, "_simpleDialogPromptViewController");
+
+                    _mainMenuViewController = Resources.FindObjectsOfTypeAll<MainMenuViewController>().First();
+                    settingsMenu = Resources.FindObjectsOfTypeAll<SettingsViewController>().FirstOrDefault();
+                    mainSettingsMenu = Resources.FindObjectsOfTypeAll<MainSettingsMenuViewController>().FirstOrDefault();
+                    _mainSettingsTableView = mainSettingsMenu.GetPrivateField<MainSettingsTableView>("_mainSettingsTableView");
+                    subMenuTableView = _mainSettingsTableView.GetPrivateField<TableView>("_tableView");
+                    othersSubmenu = settingsMenu.transform.Find("SubSettingsViewControllers").Find("Others");
+
+                    RectTransform okButton = (RectTransform)settingsMenu.transform.Find("OkButton"); //{x: -17, y: 6}
+                    RectTransform CancelButton = (RectTransform)settingsMenu.transform.Find("CancelButton"); // {x: 0, y: 6}
+                    RectTransform ApplyButton = (RectTransform)settingsMenu.transform.Find("ApplyButton"); // {x: 17, y: 6}
+
+                    okButton.anchoredPosition += buttonOffset;
+                    CancelButton.anchoredPosition += buttonOffset;
+                    ApplyButton.anchoredPosition += buttonOffset;
+
+                    if (subMenuTableView != null)
+                    {
+                        AddPageButtons();
+                    }
+
+                    if (tableCell == null)
+                    {
+                        tableCell = Resources.FindObjectsOfTypeAll<MainSettingsTableCell>().FirstOrDefault();
+                        // Get a refence to the Settings Table cell text in case we want to change font size, etc
+                        var text = tableCell.GetPrivateField<TextMeshProUGUI>("_settingsSubMenuText");
+                    }
+                    ready = true;
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("Beat Saver UI: Oops - " + e.Message);
+                }
+            }
+        }
+
+        static void AddPageButtons()
+        {
+            if (_pageUpButton == null)
+            {
+                _pageUpButton = Instantiate(Resources.FindObjectsOfTypeAll<Button>().First(x => (x.name == "PageUpButton")), settingsMenu.transform, false);
+                //(_pageUpButton.transform as RectTransform).anchorMin = new Vector2(0.5f, 1f);
+                //(_pageUpButton.transform as RectTransform).anchorMax = new Vector2(0.5f, 1f);
+                //(_pageUpButton.transform as RectTransform).anchoredPosition = new Vector2(0f, -14f);
+                _pageUpButton.interactable = true;
+                //_pageUpButton.onClick.AddListener(new UnityAction(subMenuTableView.PageScrollUp));
+            }
+
+            if (_pageDownButton == null)
+            {
+                _pageDownButton = Instantiate(Resources.FindObjectsOfTypeAll<Button>().First(x => (x.name == "PageDownButton")), settingsMenu.transform, false);
+                //(_pageDownButton.transform as RectTransform).anchorMin = new Vector2(0.5f, 0f);
+                //(_pageDownButton.transform as RectTransform).anchorMax = new Vector2(0.5f, 0f);
+                //(_pageDownButton.transform as RectTransform).anchoredPosition = new Vector2(0f, 8f);
+                _pageDownButton.interactable = true;
+                //_pageDownButton.onClick.AddListener(new UnityAction(subMenuTableView.PageScrollDown));
+            }
+
+            /*
+             * Just copying the buttons, and not setting them to the table view
+             * they don't appear. And when they are set, they are disabled because the table
+             * thinks the scroll view is big enough to display all the cells
+             */
+
+            //subMenuTableView.SetPrivateField("_pageUpButton", _pageUpButton);
+            //subMenuTableView.SetPrivateField("_pageDownButton", _pageDownButton);
+        }
+
         public static SubMenu CreateSubMenu(string name)
+        {
+            return CreateSubMenu<VRUIViewController>(name);
+        }
+
+        public static SubMenu CreateSubMenu<T>(string name) where T : VRUIViewController
         {
             if (SceneManager.GetActiveScene().buildIndex != MainScene)
             {
@@ -62,28 +188,22 @@ namespace BeatSaberUI
                 return null;
             }
 
-            if (tableCell == null)
-            {
-                tableCell = Resources.FindObjectsOfTypeAll<MainSettingsTableCell>().FirstOrDefault();
-                // Get a refence to the Settings Table cell text in case we want to change fint size, etc
-                var text = tableCell.GetPrivateField<TextMeshProUGUI>("_settingsSubMenuText");
-            }
+            SetupUI();
 
-            var temp = Resources.FindObjectsOfTypeAll<SettingsViewController>().FirstOrDefault();
-            var others = temp.transform.Find("SubSettingsViewControllers").Find("Others");
-            var tweakSettingsObject = Instantiate(others.gameObject, others.transform.parent);
-            Transform mainContainer = CleanScreen(tweakSettingsObject.transform);
+            var subMenuGameObject = Instantiate(othersSubmenu.gameObject, othersSubmenu.transform.parent);
+            Transform mainContainer = CleanScreen(subMenuGameObject.transform);
 
-            var tweaksSubMenu = new SettingsSubMenuInfo();
-            tweaksSubMenu.SetPrivateField("_menuName", name);
-            tweaksSubMenu.SetPrivateField("_controller", tweakSettingsObject.GetComponent<VRUIViewController>());
+            var oldViewController = subMenuGameObject.GetComponent<VRUIViewController>();
+            var newViewController = (T)ReflectionUtil.CopyComponent(oldViewController, typeof(VRUIViewController), typeof(T), subMenuGameObject);
+            DestroyImmediate(oldViewController);
 
-            var mainSettingsMenu = Resources.FindObjectsOfTypeAll<MainSettingsMenuViewController>().FirstOrDefault();
+            var newSubMenu = new SettingsSubMenuInfo();
+            newSubMenu.SetPrivateField("_menuName", name);
+            newSubMenu.SetPrivateField("_controller", newViewController);
+
             var subMenus = mainSettingsMenu.GetPrivateField<SettingsSubMenuInfo[]>("_settingsSubMenuInfos").ToList();
-            subMenus.Add(tweaksSubMenu);
+            subMenus.Add(newSubMenu);
             mainSettingsMenu.SetPrivateField("_settingsSubMenuInfos", subMenus.ToArray());
-
-            // Find the table view and if page buttons don't exist add them
 
             SubMenu menu = new SubMenu(mainContainer);
             return menu;
@@ -98,6 +218,21 @@ namespace BeatSaberUI
                 DestroyImmediate(child.gameObject);
             }
             return container;
+        }
+
+        public static void LogComponents(Transform t, string prefix)
+        {
+            Console.WriteLine(prefix + ">" + t.name);
+
+            foreach (var comp in t.GetComponents<MonoBehaviour>())
+            {
+                Console.WriteLine(prefix + "-->" + comp.GetType());
+            }
+
+            foreach (Transform child in t)
+            {
+                LogComponents(child, prefix + "=");
+            }
         }
     }
 }
