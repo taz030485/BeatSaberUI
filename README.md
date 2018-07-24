@@ -15,9 +15,13 @@ Remember to add
 ```csharp
 using BeatSaberUI;
 ```
-To create a sub menu  
+To create a basic sub menu  
 ```csharp
 var subMenu = SettingsUI.CreateSubMenu("Interface Tweaks"); // Passing in the sub menu label
+```
+To create a sub menu with a custom viewController, allowing you to also activate left and right screen viewControllers  
+```csharp
+var subMenu = SettingsUI.CreateSubMenu<T>("Interface Tweaks"); // Passing in the sub menu label
 ```
 To add a On/Off toggle
 ```csharp
