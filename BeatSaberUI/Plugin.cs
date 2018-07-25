@@ -18,6 +18,7 @@ namespace BeatSaberUI
             _init = true;
 
             SettingsUI.OnLoad();
+            ModMenuUI.OnLoad();
         }
 
         public void OnApplicationQuit()

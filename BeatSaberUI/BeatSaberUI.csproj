@@ -59,12 +59,20 @@
       <HintPath>..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Beat Saber\Beat Saber_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="UnityEngine.TextRenderingModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>bin\Debug\UnityEngine.TextRenderingModule.dll</HintPath>
+    </Reference>
     <Reference Include="UnityEngine.UI">
       <HintPath>..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Beat Saber\Beat Saber_Data\Managed\UnityEngine.UI.dll</HintPath>
       <Private>False</Private>
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ViewControllers\ModMenuListTableCell.cs" />
+    <Compile Include="ViewControllers\ModMenuListViewController.cs" />
+    <Compile Include="ViewControllers\ModMenuMasterViewController.cs" />
+    <Compile Include="ModMenuUI.cs" />
     <Compile Include="SubMenu.cs" />
     <Compile Include="Utilities\ConInput.cs" />
     <Compile Include="Plugin.cs" />
@@ -72,6 +80,7 @@
     <Compile Include="Utilities\ReflectionUtil.cs" />
     <Compile Include="Utilities\Ryder.Lightweight.cs" />
     <Compile Include="SettingsUI.cs" />
+    <Compile Include="Utilities\TableViewHelper.cs" />
     <Compile Include="ViewControllers\ListViewController.cs" />
     <Compile Include="ViewControllers\BoolViewController.cs" />
   </ItemGroup>
