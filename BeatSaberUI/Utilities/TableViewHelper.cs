@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 
-namespace BeatSaberUI.Utilities
+namespace BeatSaberUI
 {
     class TableViewHelper : MonoBehaviour
     {
@@ -18,11 +18,13 @@ namespace BeatSaberUI.Utilities
             get { return table.GetPrivateField<RectTransform>("_scrollRectTransform"); }
             set { table.SetPrivateField("_scrollRectTransform", value); }
         }
+
         int _numberOfRows
         {
             get { return table.GetPrivateField<int>("_numberOfRows"); }
             set { table.SetPrivateField("_numberOfRows", value); }
         }
+
         float _rowHeight
         {
             get { return table.GetPrivateField<float>("_rowHeight"); }
@@ -51,7 +53,6 @@ namespace BeatSaberUI.Utilities
             }
             table.RefreshScrollButtons();
             _scrollRectTransform.sizeDelta = new Vector2(-20f, -10f);
-            //Console.WriteLine("RectTransform: " + _scrollRectTransform + "\nAnchored position: " + _scrollRectTransform.anchoredPosition + "\nAnchor min: " + _scrollRectTransform.anchorMin + "\nAnchor max: " + _scrollRectTransform.anchorMax + "\nSize delta: " + _scrollRectTransform.sizeDelta);
         }
 
         public void PageScrollDown()
@@ -65,7 +66,6 @@ namespace BeatSaberUI.Utilities
             table.RefreshScrollButtons();
 
             _scrollRectTransform.sizeDelta = new Vector2(-20f, -10f);
-            //Console.WriteLine("RectTransform: " + _scrollRectTransform + "\nAnchored position: " + _scrollRectTransform.anchoredPosition + "\nAnchor min: " + _scrollRectTransform.anchorMin + "\nAnchor max: " + _scrollRectTransform.anchorMax + "\nSize delta: " + _scrollRectTransform.sizeDelta);
         }
 
         private float GetNumberOfVisibleRows()
@@ -80,6 +80,5 @@ namespace BeatSaberUI.Utilities
             int num2 = Mathf.CeilToInt(num / _rowHeight);
             return 1f / num2;
         }
-
     }
 }

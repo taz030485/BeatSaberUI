@@ -72,6 +72,7 @@
     <Compile Include="Utilities\ReflectionUtil.cs" />
     <Compile Include="Utilities\Ryder.Lightweight.cs" />
     <Compile Include="SettingsUI.cs" />
+    <Compile Include="Utilities\TableViewHelper.cs" />
     <Compile Include="ViewControllers\ListViewController.cs" />
     <Compile Include="ViewControllers\BoolViewController.cs" />
   </ItemGroup>
