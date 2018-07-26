@@ -5,7 +5,6 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 using VRUI;
-using BeatSaberUI.Utilities;
 
 namespace BeatSaberUI
 {
