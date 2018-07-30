@@ -17,8 +17,8 @@ namespace BeatSaberUI
 {
     public class SettingsUI : MonoBehaviour
     {
-        public const int MainScene = 1;
-        public const int GameScene = 5;
+        public const string MainScene = "Menu";
+        public const string GameScene = "StandardLevel";
         
         static SettingsUI Instance = null;
         static bool ready = false;
@@ -82,7 +82,7 @@ namespace BeatSaberUI
 
         public void SceneManagerOnActiveSceneChanged(Scene arg0, Scene scene)
         {
-            if (scene.buildIndex == MainScene)
+            if (scene.name == MainScene)
             {
                 SetupUI();
 
@@ -187,7 +187,7 @@ namespace BeatSaberUI
 
         public static SubMenu CreateSubMenu<T>(string name) where T : VRUIViewController
         {
-            if (SceneManager.GetActiveScene().buildIndex != MainScene)
+            if (SceneManager.GetActiveScene().name != MainScene)
             {
                 Console.WriteLine("Cannot create settings menu when no in the main scene.");
                 return null;
