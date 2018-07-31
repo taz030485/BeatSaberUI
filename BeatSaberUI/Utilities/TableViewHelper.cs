@@ -64,7 +64,6 @@ namespace BeatSaberUI
                 _targetVerticalNormalizedPosition = 0f;
             }
             table.RefreshScrollButtons();
-
             _scrollRectTransform.sizeDelta = new Vector2(-20f, -10f);
         }
 

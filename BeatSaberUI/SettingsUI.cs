@@ -17,9 +17,6 @@ namespace BeatSaberUI
 {
     public class SettingsUI : MonoBehaviour
     {
-        public const int MainScene = 1;
-        public const int GameScene = 5;
-        
         static SettingsUI Instance = null;
         static bool ready = false;
         public static bool Ready
@@ -28,7 +25,7 @@ namespace BeatSaberUI
         }
 
         static MainMenuViewController _mainMenuViewController = null;
-        static SettingsViewController settingsMenu = null;
+        static SettingsNavigationController settingsMenu = null;
         static MainSettingsMenuViewController mainSettingsMenu = null;
         static MainSettingsTableView _mainSettingsTableView = null;
         static TableView subMenuTableView = null;
@@ -40,7 +37,9 @@ namespace BeatSaberUI
         static Transform othersSubmenu = null;
         static Vector2 buttonOffset = new Vector2(24, 0);
 
-        static SimpleDialogPromptViewController prompt = null;        
+        static SimpleDialogPromptViewController prompt = null;
+
+        static List<SubMenu> subMenus;
 
         public static void OnLoad()
         {
@@ -82,7 +81,7 @@ namespace BeatSaberUI
 
         public void SceneManagerOnActiveSceneChanged(Scene arg0, Scene scene)
         {
-            if (scene.buildIndex == MainScene)
+            if (BSUIHelpers.isMenuScene(scene))
             {
                 SetupUI();
 
@@ -110,7 +109,7 @@ namespace BeatSaberUI
                     prompt = ReflectionUtil.GetPrivateField<SimpleDialogPromptViewController>(_menuMasterViewController, "_simpleDialogPromptViewController");
 
                     _mainMenuViewController = Resources.FindObjectsOfTypeAll<MainMenuViewController>().First();
-                    settingsMenu = Resources.FindObjectsOfTypeAll<SettingsViewController>().FirstOrDefault();
+                    settingsMenu = Resources.FindObjectsOfTypeAll<SettingsNavigationController>().FirstOrDefault();
                     mainSettingsMenu = Resources.FindObjectsOfTypeAll<MainSettingsMenuViewController>().FirstOrDefault();
                     _mainSettingsTableView = mainSettingsMenu.GetPrivateField<MainSettingsTableView>("_mainSettingsTableView");
                     subMenuTableView = _mainSettingsTableView.GetComponentInChildren<TableView>();
@@ -136,6 +135,9 @@ namespace BeatSaberUI
                         // Get a refence to the Settings Table cell text in case we want to change font size, etc
                         var text = tableCell.GetPrivateField<TextMeshProUGUI>("_settingsSubMenuText");
                     }
+
+                    subMenus = new List<SubMenu>();
+
                     ready = true;
                 }
                 catch (Exception e)
@@ -187,13 +189,19 @@ namespace BeatSaberUI
 
         public static SubMenu CreateSubMenu<T>(string name) where T : VRUIViewController
         {
-            if (SceneManager.GetActiveScene().buildIndex != MainScene)
+            if (!BSUIHelpers.isMenuScene(SceneManager.GetActiveScene()))
             {
                 Console.WriteLine("Cannot create settings menu when no in the main scene.");
                 return null;
             }
 
             SetupUI();
+
+            var menu = subMenus.Find(x => x.Name == name);
+            if (menu != null)
+            {
+                return menu;
+            }
 
             var subMenuGameObject = Instantiate(othersSubmenu.gameObject, othersSubmenu.transform.parent);
             Transform mainContainer = CleanScreen(subMenuGameObject.transform);
@@ -202,16 +210,19 @@ namespace BeatSaberUI
             var newViewController = (T)ReflectionUtil.CopyComponent(oldViewController, typeof(VRUIViewController), typeof(T), subMenuGameObject);
             DestroyImmediate(oldViewController);
 
-            var newSubMenu = new SettingsSubMenuInfo();
-            newSubMenu.SetPrivateField("_menuName", name);
-            newSubMenu.SetPrivateField("_controller", newViewController);
+            var newSubMenuInfo = new SettingsSubMenuInfo();
+            newSubMenuInfo.SetPrivateField("_menuName", name);
+            newSubMenuInfo.SetPrivateField("_controller", newViewController);
 
-            var subMenus = mainSettingsMenu.GetPrivateField<SettingsSubMenuInfo[]>("_settingsSubMenuInfos").ToList();
-            subMenus.Add(newSubMenu);
-            mainSettingsMenu.SetPrivateField("_settingsSubMenuInfos", subMenus.ToArray());
+            var subMenuInfos = mainSettingsMenu.GetPrivateField<SettingsSubMenuInfo[]>("_settingsSubMenuInfos").ToList();
+            subMenuInfos.Add(newSubMenuInfo);
+            mainSettingsMenu.SetPrivateField("_settingsSubMenuInfos", subMenuInfos.ToArray());
 
-            SubMenu menu = new SubMenu(mainContainer);
-            return menu;
+            SubMenu subMenu = new SubMenu(name, mainContainer, newSubMenuInfo);
+
+            subMenus.Add(subMenu);
+
+            return subMenu;
         }
 
         static Transform CleanScreen(Transform screen)

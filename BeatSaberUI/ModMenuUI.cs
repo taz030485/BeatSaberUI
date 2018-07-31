@@ -11,9 +11,6 @@ namespace BeatSaberUI
 {
     public class ModMenuUI : MonoBehaviour
     {
-        public const int MainScene = 1;
-        public const int GameScene = 5;
-
         public static ModMenuUI Instance;
         public static List<ModMenuButton> modMenuButtons;
 
@@ -66,7 +63,7 @@ namespace BeatSaberUI
 
         private void SceneManagerOnActiveSceneChanged(Scene arg0, Scene scene)
         {
-            if (scene.buildIndex == MainScene)
+            if (BSUIHelpers.isMenuScene(scene))
             {
                 SetupUI();
             }

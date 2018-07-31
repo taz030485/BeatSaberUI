@@ -16,10 +16,21 @@ namespace BeatSaberUI
     public class SubMenu
     {
         public Transform transform;
-
-        public SubMenu(Transform transform)
+        string name;
+        SettingsSubMenuInfo info;
+        public string Name
         {
+            get
+            {
+                return name;
+            }
+        }
+
+        public SubMenu(string name, Transform transform, SettingsSubMenuInfo info)
+        {
+            this.name = name;
             this.transform = transform;
+            this.info = info;
         }
 
         public BoolViewController AddBool(string name)
