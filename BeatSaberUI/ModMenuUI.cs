@@ -12,7 +12,7 @@ namespace BeatSaberUI
     public class ModMenuUI : MonoBehaviour
     {
         public static ModMenuUI Instance;
-        public static List<ModMenuButton> modMenuButtons;
+        public static readonly List<ModMenuButton> modMenuButtons = new List<ModMenuButton>();
 
         static ModMenuMasterViewController _modMenuMasterViewController;
         static RectTransform _mainMenuRectTransform;
@@ -115,7 +115,6 @@ namespace BeatSaberUI
 
         public static void AddMenuButton(string buttonText, Action call)
         {
-            if (modMenuButtons == null) modMenuButtons = new List<ModMenuButton>();
             modMenuButtons.Add(new ModMenuButton(buttonText, call));
         }
         
