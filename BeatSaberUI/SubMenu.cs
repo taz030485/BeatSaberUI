@@ -38,6 +38,13 @@ namespace BeatSaberUI
             return AddToggleSetting<BoolViewController>(name);
         }
 
+        public IntViewController AddInt(string name, int min, int max, int increment)
+        {
+            var view = AddIntSetting<IntViewController>(name);
+            view.SetValues(min, max, increment);
+            return view;
+        }
+
         public ListViewController AddList(string name, float[] values)
         {
             var view = AddListSetting<ListViewController>(name);
@@ -68,6 +75,21 @@ namespace BeatSaberUI
 
             WindowModeSettingsController volume = newSettingsObject.GetComponent<WindowModeSettingsController>();
             T newToggleSettingsController = (T)ReflectionUtil.CopyComponent(volume, typeof(SwitchSettingsController), typeof(T), newSettingsObject);
+            MonoBehaviour.DestroyImmediate(volume);
+
+            newSettingsObject.GetComponentInChildren<TMP_Text>().text = name;
+
+            return newToggleSettingsController;
+        }
+
+        public T AddIntSetting<T>(string name) where T : IntSettingsController
+        {
+            var volumeSettings = Resources.FindObjectsOfTypeAll<WindowModeSettingsController>().FirstOrDefault();
+            GameObject newSettingsObject = MonoBehaviour.Instantiate(volumeSettings.gameObject, transform);
+            newSettingsObject.name = name;
+
+            WindowModeSettingsController volume = newSettingsObject.GetComponent<WindowModeSettingsController>();
+            T newToggleSettingsController = (T)ReflectionUtil.CopyComponent(volume, typeof(IncDecSettingsController), typeof(T), newSettingsObject);
             MonoBehaviour.DestroyImmediate(volume);
 
             newSettingsObject.GetComponentInChildren<TMP_Text>().text = name;
